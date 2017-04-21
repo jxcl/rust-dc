@@ -2,8 +2,7 @@ use std::io;
 
 enum InputToken {
     Number(i64),
-    Command(char),
-    Operator(char),
+    Commands(Vec<char>),
 }
 
 fn main() {
@@ -22,31 +21,40 @@ fn main() {
 
             match input {
                 InputToken::Number(num) => stack.push(num),
-                InputToken::Command(c) => handle_command(c, &stack),
-                InputToken::Operator(o) => handle_operator(o, &mut stack),
+                InputToken::Commands(v) => handle_commands(v, &mut stack),
             }
         }
     }
 }
 
-fn handle_operator(op: char, stack: &mut Vec<i64>) {
-    match op {
-        '+' => {
-            let (a, b) = (stack.pop().unwrap(), stack.pop().unwrap());
-            stack.insert(0, a + b);
-        },
-        _ => panic!("Invalid operation!"),
-    }
-}
-
-fn handle_command(comm: char, stack: &Vec<i64>) {
-    match comm {
-        'f' => {
-            for i in stack {
-                println!("{}", i);
-            }
-        },
-        _ => (),
+fn handle_commands(comms: Vec<char>, stack: &mut Vec<i64>) {
+    for command in comms {
+        match command {
+            'p' => {
+                println!("{}", stack[stack.len() - 1]);
+            },
+            'n' => {
+                println!("{}", stack.pop().unwrap());
+            },
+            'f' => {
+                for i in stack.iter() {
+                    println!("{}", i);
+                }
+            },
+            '+' => {
+                let (a, b) = (stack.pop().unwrap(), stack.pop().unwrap());
+                stack.push(a + b);
+            },
+            '-' => {
+                let (a, b) = (stack.pop().unwrap(), stack.pop().unwrap());
+                stack.push(b - a);
+            },
+            '*' => {
+                let (a, b) = (stack.pop().unwrap(), stack.pop().unwrap());
+                stack.push(a * b);
+            },
+            n => panic!("Invalid operator {}!", n),
+        }
     }
 }
 
@@ -58,10 +66,5 @@ fn parse_input(input: &str) -> InputToken {
         return InputToken::Number(num);
     }
 
-    match input.chars().next() {
-            Some('+') => InputToken::Operator('+'),
-            Some('-') => InputToken::Operator('-'),
-            Some('f') => InputToken::Command('f'),
-            _ => panic!("Invalid input"),
-    }
+    InputToken::Commands(input.chars().collect())
 }
