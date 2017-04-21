@@ -1,0 +1,6 @@
+[package]
+name = "rust_dc"
+version = "0.1.0"
+authors = ["Alexander Bliskovsky <abliskovsky@fusionbox.com>"]
+
+[dependencies]
